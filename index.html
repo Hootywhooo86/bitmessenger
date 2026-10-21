@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bitmessenger — Talk, but chunkier.</title>
+<meta name="description" content="bitmessenger is the 128bit family's pixel messaging app: chunky chat bubbles, pixel stickers, family group chats and streaks — talking, but make it 128-bit. Coming soon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0b16;
+    --panel:#141428;
+    --pink:#ff5d8f;
+    --pink-deep:#b02a52;
+    --teal:#2dd4bf;
+    --orange:#ff9f1c;
+    --ink:#f4f1ff;
+    --muted:#9a97b8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:radial-gradient(rgba(255,93,143,.08) 1px, transparent 1px);
+    background-size:22px 22px;
+  }
+  .wrap{max-width:960px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+  .pixel{font-family:'Press Start 2P',monospace}
+  /* ---------- nav ---------- */
+  nav{display:flex;justify-content:space-between;align-items:center;padding:22px 0}
+  .logo{display:flex;align-items:center;gap:12px;font-family:'Press Start 2P',monospace;font-size:15px}
+  .logo-mark{
+    width:34px;height:34px;background:var(--pink);display:grid;place-items:center;font-size:18px;
+    box-shadow:0 4px 0 var(--pink-deep), 4px 0 0 var(--pink-deep), -4px 0 0 var(--pink-deep), 0 -4px 0 var(--pink-deep);
+    image-rendering:pixelated;
+  }
+  .badge{
+    font-family:'Press Start 2P',monospace;font-size:9px;color:var(--bg);background:var(--orange);
+    padding:8px 10px;letter-spacing:1px;
+    box-shadow:0 4px 0 #a05e00;
+  }
+  /* ---------- hero ---------- */
+  header{text-align:center;padding:60px 0 40px}
+  .eyebrow{font-family:'Press Start 2P',monospace;font-size:10px;color:var(--pink);letter-spacing:2px;margin-bottom:26px}
+  h1{
+    font-family:'Press Start 2P',monospace;
+    font-size:clamp(24px,6vw,50px);line-height:1.35;margin-bottom:26px;
+    text-shadow:0 4px 0 #1a1a33, 4px 0 0 #1a1a33;
+  }
+  h1 .p{color:var(--pink)} h1 .o{color:var(--orange)}
+  .sub{color:var(--muted);font-size:18px;max-width:620px;margin:0 auto 20px;line-height:1.6}
+  .try{font-family:'Press Start 2P',monospace;font-size:9px;color:var(--teal);letter-spacing:1px;margin-bottom:26px}
+  /* ---------- phone mock ---------- */
+  .phone{
+    width:320px;max-width:92vw;margin:0 auto 36px;background:#05050d;
+    border:4px solid #2c2c52;padding:12px;
+    box-shadow:8px 8px 0 #08081a;text-align:left;
+  }
+  .chathead{
+    display:flex;align-items:center;gap:10px;background:var(--panel);
+    border:3px solid #26264a;padding:10px 12px;margin-bottom:12px;
+  }
+  .avatar{
+    width:38px;height:38px;flex:none;display:grid;place-items:center;font-size:20px;
+    background:var(--pink);box-shadow:3px 3px 0 var(--pink-deep);
+  }
+  .chathead .who{line-height:1.4}
+  .chathead .nm{font-family:'Press Start 2P',monospace;font-size:10px}
+  .chathead .st{font-size:11px;color:var(--teal)}
+  .chathead .streak{margin-left:auto;text-align:right;font-family:'Press Start 2P',monospace;font-size:8px;color:var(--orange);line-height:1.7}
+  .thread{height:308px;overflow-y:auto;padding:4px 2px;display:flex;flex-direction:column;gap:9px}
+  .msg{max-width:82%;padding:9px 11px;font-size:13px;line-height:1.5;position:relative}
+  .msg.them{background:var(--panel);border:3px solid #26264a;align-self:flex-start;box-shadow:3px 3px 0 #08081a}
+  .msg.me{background:var(--pink-deep);border:3px solid var(--pink);align-self:flex-end;box-shadow:3px 3px 0 #08081a}
+  .msg .meta{display:block;margin-top:5px;font-size:9px;color:var(--muted)}
+  .msg.me .meta{color:#ffc2d4;text-align:right}
+  .msg.sticker{background:none;border:none;box-shadow:none;font-size:38px;padding:0 4px}
+  .typing{align-self:flex-start;background:var(--panel);border:3px solid #26264a;padding:9px 13px;display:none;box-shadow:3px 3px 0 #08081a}
+  .typing.on{display:block}
+  .typing i{display:inline-block;width:6px;height:6px;background:var(--muted);margin-right:3px;animation:blink 1s steps(2) infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s;margin-right:0}
+  @keyframes blink{50%{opacity:.15}}
+  .composer{display:flex;gap:8px;margin-top:12px}
+  .composer input{
+    flex:1;background:var(--panel);border:3px solid #26264a;color:var(--ink);
+    padding:11px 12px;font-size:14px;font-family:'Inter',sans-serif;outline:none;min-width:0;
+  }
+  .composer input:focus{border-color:var(--pink)}
+  .composer button{
+    font-family:'Press Start 2P',monospace;font-size:10px;background:var(--pink);color:#2b0013;
+    border:3px solid var(--pink);padding:0 16px;cursor:pointer;
+    box-shadow:0 4px 0 var(--pink-deep);transition:transform .08s, box-shadow .08s;
+  }
+  .composer button:active{transform:translateY(4px);box-shadow:0 0 0 var(--pink-deep)}
+  .stickers{display:flex;gap:8px;margin-top:10px}
+  .stickers button{
+    flex:1;background:var(--panel);border:3px solid #26264a;font-size:19px;padding:6px 0;cursor:pointer;
+    box-shadow:3px 3px 0 #08081a;transition:transform .08s, box-shadow .08s, border-color .08s;
+  }
+  .stickers button:hover{border-color:var(--pink)}
+  .stickers button:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #08081a}
+  .toast{
+    min-height:20px;text-align:center;font-family:'Press Start 2P',monospace;
+    font-size:9px;color:var(--teal);margin-bottom:30px;letter-spacing:1px;line-height:1.8;
+  }
+  /* ---------- waitlist form ---------- */
+  form.waitlist{display:flex;gap:0;max-width:480px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+  form.waitlist input{
+    flex:1 1 240px;background:var(--panel);border:3px solid var(--pink);color:var(--ink);
+    padding:14px 16px;font-size:15px;font-family:'Inter',sans-serif;outline:none;min-width:0;
+  }
+  form.waitlist input:focus{border-color:var(--orange)}
+  form.waitlist button{
+    font-family:'Press Start 2P',monospace;font-size:11px;background:var(--orange);color:#201100;
+    border:3px solid var(--orange);padding:14px 20px;cursor:pointer;
+    box-shadow:0 5px 0 #a05e00;transition:transform .08s, box-shadow .08s;
+  }
+  form.waitlist button:hover{transform:translateY(2px);box-shadow:0 3px 0 #a05e00}
+  form.waitlist button:active{transform:translateY(5px);box-shadow:0 0 0 #a05e00}
+  .form-note{margin-top:14px;font-size:13px;color:var(--muted)}
+  .form-ok{margin-top:14px;font-size:14px;color:var(--teal);font-weight:600;display:none}
+  /* ---------- features ---------- */
+  section{padding:56px 0}
+  h2{font-family:'Press Start 2P',monospace;font-size:clamp(16px,3.4vw,24px);text-align:center;margin-bottom:40px;line-height:1.5}
+  h2 .o{color:var(--orange)}
+  .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+  .card{
+    background:var(--panel);border:3px solid #26264a;padding:26px 22px;
+    box-shadow:6px 6px 0 #08081a;transition:transform .12s, border-color .12s;
+  }
+  .card:hover{transform:translateY(-4px);border-color:var(--pink)}
+  .card .ico{font-size:30px;margin-bottom:16px;display:block}
+  .card h3{font-family:'Press Start 2P',monospace;font-size:12px;margin-bottom:12px;color:var(--pink);line-height:1.6}
+  .card p{color:var(--muted);font-size:14px;line-height:1.65}
+  /* ---------- strip ---------- */
+  .strip{
+    background:linear-gradient(180deg,#171732,#101024);
+    border-top:3px solid var(--pink);border-bottom:3px solid var(--pink);
+    text-align:center;padding:44px 20px;
+  }
+  .strip .pixel{font-size:12px;color:var(--pink);letter-spacing:2px;display:block;margin-bottom:16px;line-height:1.8}
+  .strip p{color:var(--muted);max-width:560px;margin:0 auto;line-height:1.7;font-size:15px}
+  /* ---------- footer ---------- */
+  footer{border-top:3px solid #26264a;padding:34px 0;text-align:center;color:var(--muted);font-size:13px;line-height:2}
+  footer .fam{font-family:'Press Start 2P',monospace;font-size:9px;letter-spacing:1px;color:var(--ink)}
+  footer .fam span{color:var(--pink)}
+  @media (max-width:560px){
+    form.waitlist button{flex:1 1 100%;margin-top:10px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav>
+    <div class="logo"><span class="logo-mark">💬</span>bitmessenger</div>
+    <span class="badge">COMING SOON</span>
+  </nav>
+
+  <header>
+    <div class="eyebrow">FROM THE 128BIT FAMILY</div>
+    <h1><span class="p">TALK,</span><br><span class="o">BUT CHUNKIER.</span></h1>
+    <p class="sub">bitmessenger is the 128bit family's pixel messaging app — chunky chat bubbles, pixel stickers, family group chats, and streaks worth keeping. Your conversations, in glorious 128-bit.</p>
+    <p class="try">▼ TRY IT — SEND CARLOS A MESSAGE ▼</p>
+
+    <!-- Interactive pixel chat mock -->
+    <div class="phone" aria-label="Interactive bitmessenger mock">
+      <div class="chathead">
+        <div class="avatar">🧑‍💻</div>
+        <div class="who">
+          <div class="nm">CARLOS</div>
+          <div class="st">● online — building stuff</div>
+        </div>
+        <div class="streak">🔥 STREAK<br>14 DAYS</div>
+      </div>
+
+      <div class="thread" id="thread">
+        <div class="msg them">yo. the launcher mock is SICK 🚀<span class="meta">2:41 PM</span></div>
+        <div class="msg me">fist my bump 👊 wait till you see the messenger<span class="meta">2:42 PM ✓✓</span></div>
+        <div class="msg them">a PIXEL messenger?? bubbles better be chunky<span class="meta">2:42 PM</span></div>
+        <div class="msg me sticker">⭐</div>
+        <div class="msg them">ok i'm in. what's the family group called<span class="meta">2:43 PM</span></div>
+        <div class="typing" id="typing"><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="composer">
+        <input id="composerInput" type="text" placeholder="Type a pixel message…" aria-label="Type a message" maxlength="120">
+        <button id="sendBtn" type="button">SEND</button>
+      </div>
+      <div class="stickers" aria-label="Pixel stickers">
+        <button type="button" data-sticker="👊">👊</button>
+        <button type="button" data-sticker="⭐">⭐</button>
+        <button type="button" data-sticker="❤️">❤️</button>
+        <button type="button" data-sticker="🚀">🚀</button>
+        <button type="button" data-sticker="🎮">🎮</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">&nbsp;</div>
+
+    <!-- WAITLIST: create a free form at formspree.io and replace YOUR_FORM_ID below, then it just works. -->
+    <form class="waitlist" id="waitlist" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address">
+      <input type="hidden" name="_subject" value="bitmessenger waitlist signup">
+      <button type="submit">JOIN THE WAITLIST</button>
+    </form>
+    <p class="form-note">Early access + the first pixel sticker pack. No spam, ever.</p>
+    <p class="form-ok" id="formOk">✓ You're on the quest board. First message incoming.</p>
+  </header>
+
+  <section>
+    <h2>CHAT LIKE IT'S <span class="o">1999</span></h2>
+    <div class="fgrid">
+      <div class="card">
+        <span class="ico">💬</span>
+        <h3>CHUNKY BUBBLES</h3>
+        <p>Big pixel speech bubbles, retro typing indicators, and read receipts you can actually read. Every conversation feels like a game dialogue box — because it is one.</p>
+      </div>
+      <div class="card">
+        <span class="ico">⭐</span>
+        <h3>PIXEL STICKERS</h3>
+        <p>Sticker packs drawn in glorious low-res: fist bumps, stars, rockets, tiny dogs. Earn new packs from 128bitlife quests, trade them with friends.</p>
+      </div>
+      <div class="card">
+        <span class="ico">👨‍👩‍👧‍👦</span>
+        <h3>THE FAMILY GROUP</h3>
+        <p>One group chat for the whole crew — and the family feed lives in it. Quest completed, trip booked, streak saved: it lands in the chat like it happened there.</p>
+      </div>
+      <div class="card">
+        <span class="ico">🔥</span>
+        <h3>STREAKS WITH STAKES</h3>
+        <p>Daily chat streaks that feed the shared 128bit feed. Keep the streak, earn the XP, unlock the sticker pack. Lose it and the pixel flame goes out — no pressure.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="strip">
+  <span class="pixel">TEXTING WAS BETTER WHEN IT FELT LIKE A GAME</span>
+  <p>Old messengers had away messages, nudges and personality. bitmessenger brings that energy back — pixel avatars, status lines, and bubbles with actual corners.</p>
+</div>
+
+<div class="wrap">
+  <section class="cta" style="text-align:center">
+    <h2>SEND THE FIRST <span class="o">PIXEL</span></h2>
+    <p style="color:var(--muted);margin-bottom:26px;line-height:1.7">Join the waitlist for early access, beta builds,<br>and the Founders sticker pack.</p>
+    <form class="waitlist" id="waitlist2" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+      <input type="email" name="email" placeholder="you@example.com" required aria-label="Email address">
+      <input type="hidden" name="_subject" value="bitmessenger waitlist signup">
+      <button type="submit">JOIN THE WAITLIST</button>
+    </form>
+    <p class="form-ok" id="formOk2">✓ You're on the quest board. First message incoming.</p>
+  </section>
+
+  <footer>
+    <div class="fam"><span>bit</span>messenger · <span>bit</span>call · <span>bit</span>launcher · <span>128bit</span>fit · <span>128bit</span>play · <span>128bit</span>trip · <span>128bit</span>gold · <span>128bit</span>fantasy · <span>128bit</span>music · <span>128bit</span>tracker · <span>128bit</span>life</div>
+    bitmessenger — part of the 128bit family<br>© 2026 128bit
+  </footer>
+</div>
+
+<script>
+  var thread = document.getElementById('thread');
+  var input = document.getElementById('composerInput');
+  var typing = document.getElementById('typing');
+  var toast = document.getElementById('toast');
+  var sent = 0;
+  var replies = [
+    "ok that's going in the family group 🔥",
+    "pixel bubbles > everything. don't @ me",
+    "tell rocky the streak is SAFE another day",
+    "wait — does sending this earn XP??",
+    "chunky. typed. sent. 🏆",
+    "brb adding that to the README brief"
+  ];
+  function stamp(){
+    var d = new Date(), h = d.getHours(), m = d.getMinutes();
+    var ap = h >= 12 ? 'PM' : 'AM'; h = h % 12; if (h === 0) h = 12;
+    return h + ':' + (m < 10 ? '0' : '') + m + ' ' + ap;
+  }
+  function scrollDown(){ thread.scrollTop = thread.scrollHeight; }
+  function addMsg(text, who, sticker){
+    var div = document.createElement('div');
+    div.className = 'msg ' + who + (sticker ? ' sticker' : '');
+    if (sticker){ div.textContent = text; }
+    else {
+      div.textContent = text;
+      var meta = document.createElement('span');
+      meta.className = 'meta';
+      meta.textContent = stamp() + (who === 'me' ? ' ✓✓' : '');
+      div.appendChild(meta);
+    }
+    thread.insertBefore(div, typing);
+    scrollDown();
+  }
+  function carlosReplies(){
+    typing.classList.add('on'); scrollDown();
+    setTimeout(function(){
+      typing.classList.remove('on');
+      addMsg(replies[sent % replies.length], 'them', false);
+      sent++;
+      toast.textContent = '🔥 STREAK SAFE · +2 XP';
+    }, 1300);
+  }
+  function send(){
+    var text = input.value.trim();
+    if (!text) return;
+    addMsg(text, 'me', false);
+    input.value = '';
+    carlosReplies();
+  }
+  document.getElementById('sendBtn').addEventListener('click', send);
+  input.addEventListener('keydown', function(e){ if (e.key === 'Enter') send(); });
+  document.querySelectorAll('.stickers button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      addMsg(btn.getAttribute('data-sticker'), 'me', true);
+      carlosReplies();
+    });
+  });
+  scrollDown();
+
+  // Waitlist: if the Formspree ID hasn't been set yet, confirm locally.
+  document.querySelectorAll('form.waitlist').forEach(function(form, i){
+    form.addEventListener('submit', function(e){
+      if (form.action.indexOf('YOUR_FORM_ID') !== -1){
+        e.preventDefault();
+        var ok = document.getElementById(i === 0 ? 'formOk' : 'formOk2');
+        if (ok) ok.style.display = 'block';
+        form.querySelector('input[type=email]').value = '';
+      }
+    });
+  });
+</script>
+</body>
+</html>
