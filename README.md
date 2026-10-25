@@ -5,9 +5,25 @@ bubbles, pixel stickers, family group chats and chat streaks — with the
 shared 128bit family feed woven right into the conversation. Part of the
 128bit family.
 
-> Product direction is Daniel's call — this README is a starter brief so
-> Carlos (Claude Code) has something concrete to react to. The landing page
-> is live; the app itself is unstarted.
+> Product direction is Daniel's call. The landing page is live, and the
+> Android app lives in `android/` (see below).
+
+## The Android app (android/)
+
+Built: a native Kotlin + Jetpack Compose texting app, same stack and design system as bitcall.
+
+- **SMS client** (the README's option b): reads and sends your real texts. Works as a companion
+  right away; tap SET UP to make it the default texting app (receipts, mark read, delete).
+  Picture/group **MMS can't be received yet** and RCS chats aren't visible to any third-party app.
+- **Bitter** is pinned at the top: an animated 32x32 pixel ghost you can chat with. His brain is
+  bitcall's on-device AI (via `app.bit128.family.AI_GENERATE`, needs the family signing key) or
+  Claude with your own API key (Settings → Bitter), else an offline hello.
+- **Full theming**: every color slot (bubbles, badges, banners, FAB, header, Bitter…), corners,
+  card size, text size, per-chat wallpaper, presets, and theme codes shared with bitcall.
+- **bitcall tie-in**: 📞 in a chat opens bitcall with the number; bitcall's 💬 TEXT opens the chat here.
+
+Build: `cd android && ./gradlew testDebugUnitTest lintDebug assembleRelease`.
+Screen previews: `./gradlew recordRoborazziDebug` → `android/app/screenshots/`.
 
 ## Concept (starter — Daniel decides)
 
