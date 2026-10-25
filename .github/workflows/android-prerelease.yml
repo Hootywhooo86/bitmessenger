@@ -3,7 +3,7 @@ name: Android pre-release
 # Builds the bitmessenger APK, runs the unit tests, and publishes it as a GitHub *pre-release*.
 on:
   push:
-    branches: [main, "claude/**"]
+    branches: [main, "claude/**", "ccr-*"]
     tags: ["v*"]
     paths: ["android/**", ".github/workflows/android-prerelease.yml"]
   workflow_dispatch:
